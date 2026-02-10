@@ -56,9 +56,9 @@ class DataLoader:
                     self._records_by_state[state].append(record)
 
         except csv.Error as e:
-            raise DataLoadError(f"CSV parsing error: {e}")
+            raise DataLoadError(f"CSV parsing error: {e}") from e
         except OSError as e:
-            raise DataLoadError(f"Failed to read file: {e}")
+            raise DataLoadError(f"Failed to read file: {e}") from e
 
         if not self._records:
             raise DataLoadError("CSV file contains no data rows")
@@ -74,18 +74,20 @@ class DataLoader:
 
             try:
                 price = Decimal(row["price"].strip())
-            except InvalidOperation:
-                raise DataLoadError(f"Line {line_num}: Invalid price value '{row['price']}'")
+            except InvalidOperation as e:
+                raise DataLoadError(f"Line {line_num}: Invalid price value '{row['price']}'") from e
 
             try:
                 timestamp = datetime.strptime(row["timestamp"].strip(), self.TIMESTAMP_FORMAT)
-            except ValueError:
-                raise DataLoadError(f"Line {line_num}: Invalid timestamp '{row['timestamp']}'")
+            except ValueError as e:
+                raise DataLoadError(
+                    f"Line {line_num}: Invalid timestamp '{row['timestamp']}'"
+                ) from e
 
             return PriceRecord(state=state, price=price, timestamp=timestamp)
 
         except KeyError as e:
-            raise DataLoadError(f"Line {line_num}: Missing column {e}")
+            raise DataLoadError(f"Line {line_num}: Missing column {e}") from e
 
     def get_prices_for_state(self, state: str) -> list[PriceRecord] | None:
         return self._records_by_state.get(state.upper())
