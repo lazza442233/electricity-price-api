@@ -1,4 +1,4 @@
-.PHONY: install run test lint format clean help
+.PHONY: install run prod test lint format clean help
 
 .DEFAULT_GOAL := help
 
@@ -9,6 +9,10 @@ install:
 ## run: Start development server
 run:
 	flask run --debug
+
+## prod: Run with gunicorn (production)
+prod:
+	gunicorn "app:create_app()" --bind 0.0.0.0:5000
 
 ## test: Run tests with coverage
 test:
@@ -28,6 +32,10 @@ lint:
 format:
 	ruff format app/ tests/
 	ruff check --fix app/ tests/
+
+## clean: Remove cache files
+clean:
+	rm -rf __pycache__ **/__pycache__ .pytest_cache .mypy_cache .ruff_cache .coverage
 
 ## help: Show this help message
 help:

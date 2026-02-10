@@ -4,6 +4,8 @@ REST API for calculating mean electricity prices by Australian state.
 
 ## Setup
 
+Requires Python 3.12+
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -45,4 +47,10 @@ make test    # Run tests with coverage
 make lint    # Check code style
 make format  # Auto-format code
 make help    # Show all commands
+```
+
+## Production
+
+```bash
+make prod
 ```
