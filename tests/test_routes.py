@@ -1,5 +1,3 @@
-
-
 class TestMeanPriceEndpoint:
     def test_valid_state(self, client):
         response = client.get("/api/v1/prices/mean?state=NSW")

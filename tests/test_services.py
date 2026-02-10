@@ -13,7 +13,7 @@ class TestPriceService:
         stats = price_service.get_mean_price("NSW")
 
         assert stats.state == "NSW"
-        assert stats.count == 2
+        assert stats.record_count == 2
         assert stats.mean == Decimal("150.00")  # (100 + 200) / 2
 
     def test_get_mean_price_case_insensitive(self, price_service):
@@ -72,15 +72,15 @@ class TestPriceService:
 
 class TestPriceStatistics:
     def test_immutable(self):
-        stats = PriceStatistics(mean=Decimal("100.00"), count=10, state="NSW")
+        stats = PriceStatistics(mean=Decimal("100.00"), record_count=10, state="NSW")
 
         with pytest.raises(AttributeError):
             stats.mean = Decimal("200.00")  # type: ignore[misc]
 
     def test_tuple_unpacking(self):
-        stats = PriceStatistics(mean=Decimal("100.00"), count=10, state="NSW")
-        mean, count, state = stats
+        stats = PriceStatistics(mean=Decimal("100.00"), record_count=10, state="NSW")
+        mean, record_count, state = stats
 
         assert mean == Decimal("100.00")
-        assert count == 10
+        assert record_count == 10
         assert state == "NSW"

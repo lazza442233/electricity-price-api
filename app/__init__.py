@@ -59,15 +59,15 @@ def _register_error_handlers(app: Flask) -> None:
     """Register global error handlers."""
 
     @app.errorhandler(404)
-    def not_found(error):
+    def not_found(error: Exception) -> tuple[dict[str, str], int]:
         return {"error": "Resource not found"}, 404
 
     @app.errorhandler(500)
-    def internal_error(error):
+    def internal_error(error: Exception) -> tuple[dict[str, str], int]:
         app.logger.error(f"Internal error: {error}")
         return {"error": "Internal server error"}, 500
 
     @app.errorhandler(Exception)
-    def handle_exception(error):
+    def handle_exception(error: Exception) -> tuple[dict[str, str], int]:
         app.logger.exception(f"Unhandled exception: {error}")
         return {"error": "An unexpected error occurred"}, 500

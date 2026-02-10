@@ -1,5 +1,6 @@
 import logging
 from http import HTTPStatus
+from typing import Any
 
 from flask import Blueprint, current_app, jsonify, request
 
@@ -11,11 +12,11 @@ prices_bp = Blueprint("prices", __name__, url_prefix="/api/v1")
 
 
 def get_price_service() -> PriceService:
-    return current_app.config["PRICE_SERVICE"]
+    return current_app.config["PRICE_SERVICE"]  # type: ignore[no-any-return]
 
 
 @prices_bp.route("/prices/mean", methods=["GET"])
-def get_mean_price():
+def get_mean_price() -> tuple[Any, int]:
     state = request.args.get("state")
 
     if state is None:
@@ -48,7 +49,11 @@ def get_mean_price():
         stats = service.get_mean_price(state)
 
         return jsonify(
-            {"state": stats.state, "mean_price": float(stats.mean), "record_count": stats.count}
+            {
+                "state": stats.state,
+                "mean_price": float(stats.mean),
+                "record_count": stats.record_count,
+            }
         ), HTTPStatus.OK
 
     except StateNotFoundError as e:
@@ -57,7 +62,7 @@ def get_mean_price():
 
 
 @prices_bp.route("/states", methods=["GET"])
-def list_states():
+def list_states() -> tuple[Any, int]:
     service = get_price_service()
     states = service.get_available_states()
 
@@ -65,7 +70,7 @@ def list_states():
 
 
 @prices_bp.route("/health", methods=["GET"])
-def health_check():
+def health_check() -> tuple[Any, int]:
     service = get_price_service()
     return jsonify(
         {"status": "healthy", "record_count": service._data_loader.record_count}

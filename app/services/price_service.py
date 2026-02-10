@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class PriceStatistics(NamedTuple):
     mean: Decimal
-    count: int
+    record_count: int
     state: str
 
 
@@ -52,7 +52,7 @@ class PriceService:
         quantize_str = "0." + "0" * self._decimal_places
         rounded_mean = mean.quantize(Decimal(quantize_str), rounding=ROUND_HALF_UP)
 
-        return PriceStatistics(mean=rounded_mean, count=count, state=state)
+        return PriceStatistics(mean=rounded_mean, record_count=count, state=state)
 
     def get_available_states(self) -> list[str]:
         return self._data_loader.get_available_states()
