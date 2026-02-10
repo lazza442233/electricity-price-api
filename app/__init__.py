@@ -1,16 +1,17 @@
 import logging
 import os
+
 from flask import Flask
 
 from app.config import config_by_name
 from app.data.data_loader import DataLoader, DataLoadError
-from app.services.price_service import PriceService
 from app.routes.prices import prices_bp
+from app.services.price_service import PriceService
 
 
 def create_app(config_name: str | None = None) -> Flask:
     if config_name is None:
-        config_name = os.environ.get('FLASK_ENV', 'development')
+        config_name = os.environ.get("FLASK_ENV", "development")
 
     app = Flask(__name__)
 
@@ -21,9 +22,9 @@ def create_app(config_name: str | None = None) -> Flask:
 
     _configure_logging(app)
 
-    if app.config.get('DATA_FILE'):
+    if app.config.get("DATA_FILE"):
         try:
-            data_loader = DataLoader(app.config['DATA_FILE']).load()
+            data_loader = DataLoader(app.config["DATA_FILE"]).load()
         except DataLoadError as e:
             app.logger.error(f"Failed to load data: {e}")
             raise
@@ -32,10 +33,9 @@ def create_app(config_name: str | None = None) -> Flask:
 
     if data_loader:
         price_service = PriceService(
-            data_loader,
-            decimal_places=app.config.get('PRICE_DECIMAL_PLACES', 2)
+            data_loader, decimal_places=app.config.get("PRICE_DECIMAL_PLACES", 2)
         )
-        app.config['PRICE_SERVICE'] = price_service
+        app.config["PRICE_SERVICE"] = price_service
 
     app.register_blueprint(prices_bp)
 
@@ -51,8 +51,7 @@ def _configure_logging(app: Flask) -> None:
     log_level = logging.DEBUG if app.debug else logging.INFO
 
     logging.basicConfig(
-        level=log_level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
 
@@ -61,14 +60,14 @@ def _register_error_handlers(app: Flask) -> None:
 
     @app.errorhandler(404)
     def not_found(error):
-        return {'error': 'Resource not found'}, 404
+        return {"error": "Resource not found"}, 404
 
     @app.errorhandler(500)
     def internal_error(error):
         app.logger.error(f"Internal error: {error}")
-        return {'error': 'Internal server error'}, 500
+        return {"error": "Internal server error"}, 500
 
     @app.errorhandler(Exception)
     def handle_exception(error):
         app.logger.exception(f"Unhandled exception: {error}")
-        return {'error': 'An unexpected error occurred'}, 500
+        return {"error": "An unexpected error occurred"}, 500

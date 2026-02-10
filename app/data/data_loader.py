@@ -1,11 +1,11 @@
 from __future__ import annotations
+
 import csv
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Dict, List, Optional
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -22,20 +22,20 @@ class DataLoadError(Exception):
 
 
 class DataLoader:
-    EXPECTED_COLUMNS = {'state', 'price', 'timestamp'}
-    TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
+    EXPECTED_COLUMNS = {"state", "price", "timestamp"}
+    TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 
     def __init__(self, file_path: Path):
         self._file_path = Path(file_path)
-        self._records: List[PriceRecord] = []
-        self._records_by_state: Dict[str, List[PriceRecord]] = {}
+        self._records: list[PriceRecord] = []
+        self._records_by_state: dict[str, list[PriceRecord]] = {}
 
     def load(self) -> DataLoader:
         if not self._file_path.exists():
             raise DataLoadError(f"Data file not found: {self._file_path}")
 
         try:
-            with open(self._file_path, 'r', newline='', encoding='utf-8') as f:
+            with open(self._file_path, newline="", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
 
                 if reader.fieldnames is None:
@@ -57,50 +57,40 @@ class DataLoader:
 
         except csv.Error as e:
             raise DataLoadError(f"CSV parsing error: {e}")
-        except IOError as e:
+        except OSError as e:
             raise DataLoadError(f"Failed to read file: {e}")
 
         if not self._records:
             raise DataLoadError("CSV file contains no data rows")
 
-        logger.info(
-            f"Loaded {len(self._records)} records for "
-            f"{len(self._records_by_state)} states"
-        )
+        logger.info(f"Loaded {len(self._records)} records for {len(self._records_by_state)} states")
         return self
 
     def _parse_row(self, row: dict, line_num: int) -> PriceRecord:
         try:
-            state = row['state'].strip().upper()
+            state = row["state"].strip().upper()
             if not state:
                 raise DataLoadError(f"Line {line_num}: Empty state value")
 
             try:
-                price = Decimal(row['price'].strip())
+                price = Decimal(row["price"].strip())
             except InvalidOperation:
-                raise DataLoadError(
-                    f"Line {line_num}: Invalid price value '{row['price']}'"
-                )
+                raise DataLoadError(f"Line {line_num}: Invalid price value '{row['price']}'")
 
             try:
-                timestamp = datetime.strptime(
-                    row['timestamp'].strip(),
-                    self.TIMESTAMP_FORMAT
-                )
+                timestamp = datetime.strptime(row["timestamp"].strip(), self.TIMESTAMP_FORMAT)
             except ValueError:
-                raise DataLoadError(
-                    f"Line {line_num}: Invalid timestamp '{row['timestamp']}'"
-                )
+                raise DataLoadError(f"Line {line_num}: Invalid timestamp '{row['timestamp']}'")
 
             return PriceRecord(state=state, price=price, timestamp=timestamp)
 
         except KeyError as e:
             raise DataLoadError(f"Line {line_num}: Missing column {e}")
 
-    def get_prices_for_state(self, state: str) -> Optional[List[PriceRecord]]:
+    def get_prices_for_state(self, state: str) -> list[PriceRecord] | None:
         return self._records_by_state.get(state.upper())
 
-    def get_available_states(self) -> List[str]:
+    def get_available_states(self) -> list[str]:
         return sorted(self._records_by_state.keys())
 
     @property

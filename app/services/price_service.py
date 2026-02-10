@@ -1,6 +1,6 @@
-from decimal import Decimal, ROUND_HALF_UP
-from typing import Dict, List, NamedTuple
 import logging
+from decimal import ROUND_HALF_UP, Decimal
+from typing import NamedTuple
 
 from app.data.data_loader import DataLoader, PriceRecord
 
@@ -21,7 +21,7 @@ class PriceService:
     def __init__(self, data_loader: DataLoader, decimal_places: int = 2):
         self._data_loader = data_loader
         self._decimal_places = decimal_places
-        self._stats_cache: Dict[str, PriceStatistics] = {}
+        self._stats_cache: dict[str, PriceStatistics] = {}
 
     def get_mean_price(self, state: str) -> PriceStatistics:
         normalised_state = state.upper().strip()
@@ -34,9 +34,7 @@ class PriceService:
 
         if records is None:
             available = self._data_loader.get_available_states()
-            raise StateNotFoundError(
-                f"State '{state}' not found. Available states: {available}"
-            )
+            raise StateNotFoundError(f"State '{state}' not found. Available states: {available}")
 
         stats = self._calculate_statistics(records, normalised_state)
 
@@ -45,29 +43,18 @@ class PriceService:
 
         return stats
 
-    def _calculate_statistics(
-        self,
-        records: List[PriceRecord],
-        state: str
-    ) -> PriceStatistics:
+    def _calculate_statistics(self, records: list[PriceRecord], state: str) -> PriceStatistics:
         total = sum((r.price for r in records), Decimal(0))
         count = len(records)
 
         mean = total / count
 
-        quantize_str = '0.' + '0' * self._decimal_places
-        rounded_mean = mean.quantize(
-            Decimal(quantize_str),
-            rounding=ROUND_HALF_UP
-        )
+        quantize_str = "0." + "0" * self._decimal_places
+        rounded_mean = mean.quantize(Decimal(quantize_str), rounding=ROUND_HALF_UP)
 
-        return PriceStatistics(
-            mean=rounded_mean,
-            count=count,
-            state=state
-        )
+        return PriceStatistics(mean=rounded_mean, count=count, state=state)
 
-    def get_available_states(self) -> List[str]:
+    def get_available_states(self) -> list[str]:
         return self._data_loader.get_available_states()
 
     def clear_cache(self) -> None:
