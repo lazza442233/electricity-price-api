@@ -63,8 +63,7 @@ class DataLoader:
         if not self._records:
             raise DataLoadError("CSV file contains no data rows")
 
-        logger.info(
-            f"Loaded {len(self._records)} records for {len(self._records_by_state)} states")
+        logger.info(f"Loaded {len(self._records)} records for {len(self._records_by_state)} states")
         return self
 
     def _parse_row(self, row: dict, line_num: int) -> PriceRecord:
@@ -76,12 +75,10 @@ class DataLoader:
             try:
                 price = Decimal(row["price"].strip())
             except InvalidOperation as e:
-                raise DataLoadError(
-                    f"Line {line_num}: Invalid price value '{row['price']}'") from e
+                raise DataLoadError(f"Line {line_num}: Invalid price value '{row['price']}'") from e
 
             try:
-                timestamp = datetime.strptime(
-                    row["timestamp"].strip(), self.TIMESTAMP_FORMAT)
+                timestamp = datetime.strptime(row["timestamp"].strip(), self.TIMESTAMP_FORMAT)
             except ValueError as e:
                 raise DataLoadError(
                     f"Line {line_num}: Invalid timestamp '{row['timestamp']}'"
