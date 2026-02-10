@@ -47,7 +47,6 @@ def create_app(config_name: str | None = None) -> Flask:
 
 
 def _configure_logging(app: Flask) -> None:
-    """Configure application logging."""
     log_level = logging.DEBUG if app.debug else logging.INFO
 
     logging.basicConfig(
@@ -56,8 +55,6 @@ def _configure_logging(app: Flask) -> None:
 
 
 def _register_error_handlers(app: Flask) -> None:
-    """Register global error handlers."""
-
     @app.errorhandler(404)
     def not_found(error: Exception) -> tuple[dict[str, str], int]:
         return {"error": "Resource not found"}, 404

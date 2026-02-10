@@ -63,7 +63,6 @@ class TestDataLoader:
         assert loader.get_available_states() == ["VIC"]
 
     def test_negative_prices_allowed(self, tmp_path):
-        """Test that negative prices are valid."""
         csv_path = tmp_path / "negative.csv"
         csv_path.write_text("state,price,timestamp\nNSW,-50.00,2025-01-01 00:00:00\n")
 
@@ -74,7 +73,6 @@ class TestDataLoader:
         assert records[0].price == Decimal("-50.00")
 
     def test_get_prices_unknown_state(self, sample_csv):
-        """Test that unknown states return None."""
         loader = DataLoader(sample_csv).load()
 
         assert loader.get_prices_for_state("UNKNOWN") is None

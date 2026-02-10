@@ -34,14 +34,12 @@ class TestPriceService:
         assert stats.mean == Decimal("50.00")
 
     def test_caching_behavior(self, price_service):
-        """Test that statistics are cached."""
         stats1 = price_service.get_mean_price("NSW")
         stats2 = price_service.get_mean_price("NSW")
 
         assert stats1 is stats2
 
     def test_clear_cache(self, price_service):
-        """Test cache clearing."""
         stats1 = price_service.get_mean_price("NSW")
         price_service.clear_cache()
         stats2 = price_service.get_mean_price("NSW")
