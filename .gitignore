@@ -1,33 +1,17 @@
-# Bytecode and Caches
+# Python
 __pycache__/
 *.pyc
-.mypy_cache/
-.pytest_cache/
 
 # Virtual Environment
-.venv/
 venv/
-env/
 
-# Build and Distribution
-build/
-dist/
-*.egg-info/
-
-# Secrets
-.env
-*.log
-
-# IDE & Editor Config
-.idea/
-.vscode/
-*.swp
-*~
-
-# OS-specific
-.DS_Store
-Thumbs.db
+# Tool Caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
 # Testing
 .coverage
-htmlcov/
+
+# Environment
+.env
