@@ -12,7 +12,7 @@ run:
 
 ## prod: Run with gunicorn (production)
 prod:
-	gunicorn "app:create_app()" --bind 0.0.0.0:5000
+	FLASK_ENV=production gunicorn "app:create_app()" --bind 0.0.0.0:5000
 
 ## test: Run tests with coverage
 test:
